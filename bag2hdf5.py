@@ -13,7 +13,7 @@ Resulting hdf5 file will contain:
 
 After the creation of hdf5, extracted data from rosbag file can be discarded.
 
-Runtime performance of this script is far from ideal, hence it is open to improvement. 
+One important thing to note is that runtime performance of this script is far from ideal. 
 
 Bahri Batuhan Bilecen, 2021 August
 """
