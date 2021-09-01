@@ -17,14 +17,20 @@ parser.add_argument('--imagepath', type=str, help='Path of image files')
 parser.add_argument('--hdf5path', type=str, help='Path of hdf5 file')
 args = parser.parse_args()
 
-with h5py.File(args.hdf5path,"w") as outfile:
-    image_path_list = sorted(next(os.walk(args.imagepath))[2])
+with h5py.File(args.hdf5path,"r+") as outfile:
+    image_path_list = sorted(next(os.walk(args.imagepath))[2]) #Does not include subfolders. All items in the directory must be images.
     total_images = len(image_path_list)
     x = cv2.imread(args.imagepath + image_path_list[0]).shape[0]
     y = cv2.imread(args.imagepath + image_path_list[0]).shape[1]
 
-    hdf_image_raw = outfile.create_group("davis").create_group("left").create_dataset("image_raw", (total_images,x,y), compression="gzip")
-    
+    try:
+        hdf_image_raw = outfile.create_dataset("davis/left/image_raw", (total_images,x,y), compression="gzip")
+    except RuntimeError as e:
+        if str(e) == 'Unable to create link (name already exists)':
+            hdf_image_raw = outfile['davis/left/image_raw']
+        else:
+            raise
+
     #Writing images
     bar_image_raw = Bar('Writing grayscale images...', max=total_images)
     image_count = 0
