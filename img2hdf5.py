@@ -23,6 +23,7 @@ with h5py.File(args.hdf5path,"r+") as outfile:
     x = cv2.imread(args.imagepath + image_path_list[0]).shape[0]
     y = cv2.imread(args.imagepath + image_path_list[0]).shape[1]
 
+
     try:
         hdf_image_raw = outfile.create_dataset("davis/left/image_raw", (total_images,x,y), compression="gzip")
     except RuntimeError as e:
