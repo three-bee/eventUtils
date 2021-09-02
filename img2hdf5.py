@@ -24,7 +24,7 @@ with h5py.File(args.hdf5path,"r+") as outfile:
     x = cv2.imread(args.imagepath + image_path_list[0]).shape[1]
 
     try:
-        hdf_image_raw = outfile.create_dataset("davis/left/image_raw", (total_images,y,x), compression="gzip")
+        hdf_image_raw = outfile.create_dataset("davis/left/image_raw", (total_images,y,x), dtype='u1')
     except RuntimeError as e:
         if str(e) == 'Unable to create link (name already exists)':
             hdf_image_raw = outfile['davis/left/image_raw']
@@ -38,7 +38,7 @@ with h5py.File(args.hdf5path,"r+") as outfile:
     for image in image_path_list:
         grayscale = cv2.imread(args.imagepath + image, 0)
         #TODO: Check visually if transpose is OK
-        hdf_image_raw[image_count] = cv2.transpose(grayscale)
+        hdf_image_raw[image_count] = grayscale
         bar_image_raw.next()
         image_count += 1
 

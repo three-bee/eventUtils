@@ -48,19 +48,19 @@ bar_flow =  Bar('Writing flow files...', max=total_lowrate-1)
 
 with h5py.File(gt_file,"w") as outfile, open(image_stamps_path,'r') as image_stamps:    
     group_left = outfile.create_group("davis").create_group("left")
-    hdf_flow_dist = group_left.create_dataset("hdf_flow_dist", (total_lowrate-1,2,y,x))
-    hdf_flow_dist_ts = group_left.create_dataset("hdf_flow_dist_ts", (total_lowrate-1,1), compression="gzip")
+    hdf_flow_dist = group_left.create_dataset("hdf_flow_dist", (total_lowrate-1,2,y,x), dtype='f8')
+    hdf_flow_dist_ts = group_left.create_dataset("hdf_flow_dist_ts", (total_lowrate-1,), dtype='f8')
 
     stamps_list = image_stamps.readlines()
         
     for i in range(0,total_lowrate-1):
         flow = flowpy.flow_read(args.gtflowpath + gtflow_path_list[rate*i]) #0 rate rate*2 ...
         
-        u = cv2.resize(flow[...,0],(y,x))
-        v = cv2.resize(flow[...,1],(y,x))
+        u = cv2.resize(flow[...,0],(x,y))
+        v = cv2.resize(flow[...,1],(x,y))
 
-        hdf_flow_dist[i,0] = cv2.transpose(u)
-        hdf_flow_dist[i,1] = cv2.transpose(v)
+        hdf_flow_dist[i,0] = u
+        hdf_flow_dist[i,1] = v
 
         hdf_flow_dist_ts[i] = float(stamps_list[i])
         bar_flow.next()

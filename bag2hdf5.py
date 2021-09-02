@@ -74,15 +74,15 @@ with h5py.File(hdf5_out,"w") as outfile:
 
     #Initializing datasets (compatible with MVSEC dataset hdf5 format)
     group_left = outfile.create_group("davis").create_group("left")
-    hdf_events = group_left.create_dataset("events", (total_events,4))
-    hdf_image_raw_event_inds = group_left.create_dataset("image_raw_event_inds",(total_images,1),compression="gzip")
-    hdf_image_raw_ts = group_left.create_dataset("image_raw_ts",(total_images,1),compression="gzip")
+    hdf_events = group_left.create_dataset("events", (total_events,4), dtype='f8')
+    hdf_image_raw_event_inds = group_left.create_dataset("image_raw_event_inds",(total_images,), dtype='i8')
+    hdf_image_raw_ts = group_left.create_dataset("image_raw_ts",(total_images,), dtype='f8')
         
     #Writing events
     #TODO: Do everything with read_messages func of rosbag
     bar_events = Bar('Writing events...', max=total_events)
     event_count = 0
-
+    
     for event_group in all_events:
         event_group_splitted = event_group.split(',')
         for event in event_group_splitted:
@@ -91,8 +91,9 @@ with h5py.File(hdf5_out,"w") as outfile:
             event_splitted = event.split('\n')
 
             #x and y
-            hdf_events[event_count,0] = int(''.join(i for i in event_splitted[0] if i.isnumeric()))
-            hdf_events[event_count,1] = int(''.join(i for i in event_splitted[1] if i.isnumeric()))
+            #Note: changed x&y order
+            hdf_events[event_count,1] = int(''.join(i for i in event_splitted[0] if i.isnumeric()))
+            hdf_events[event_count,0] = int(''.join(i for i in event_splitted[1] if i.isnumeric()))
             
             #t: secs, nsecs
             secs = int(''.join(i for i in event_splitted[3] if i.isnumeric()))
@@ -111,6 +112,7 @@ with h5py.File(hdf5_out,"w") as outfile:
             bar_events.next()
             event_count += 1
     bar_events.finish()
+    
     event_stamps_file.close()
     
     #Writing image timestamps
@@ -124,9 +126,9 @@ with h5py.File(hdf5_out,"w") as outfile:
     image_stamps_file = open(os.path.splitext(args.bagfile)[0]+'/image_stamps.txt', 'w')
     
     for topic, image_msgs, t in input_bag.read_messages(topics=[('/' + args.eventtopic + '/image_raw')]):
-        hdf_image_raw_event_inds[image_count,0] = find_nearest(event_timestamp_arr, t.to_nsec())
+        hdf_image_raw_event_inds[image_count] = find_nearest(event_timestamp_arr, t.to_nsec())
         
-        hdf_image_raw_ts[image_count,0] = t.to_nsec()
+        hdf_image_raw_ts[image_count] = t.to_nsec()
         image_stamps_file.write(str(t.to_nsec())+'\n')
 
         bar_stamps.next()
