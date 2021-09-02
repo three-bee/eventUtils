@@ -11,7 +11,7 @@ Resulting hdf5 file will contain:
 -image_raw_event_inds (closest corresponding event number at the instance of image)
 -image_raw_ts (image timestamps)
 
-After the creation of hdf5, extracted data from rosbag file can be discarded.
+Extracted .txt files can be later utilized by flow2hdf5.py.
 
 One important thing to note is that runtime performance of this script is far from ideal. 
 
@@ -19,7 +19,6 @@ Bahri Batuhan Bilecen, 2021 August
 """
 
 import os
-import sys
 import argparse
 from progress.bar import Bar
 import h5py
@@ -38,7 +37,6 @@ def find_nearest(array,value):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bagfile', type=str, help='.bag file')
-parser.add_argument('--out', type=str, default='output.hdf5', help='Name of the output hdf5 file. Default is output.hdf5')
 parser.add_argument('--eventtopic', type=str, default='dvs', help='Topic name in which the event data are stored. Mostly it is dvs(ETH Zurich Event Dataset), davis(MVSEC), or cam0 (ESIM output)')
 args = parser.parse_args()
 
@@ -46,6 +44,7 @@ args = parser.parse_args()
 #TODO: Automatize eventtopic argument
 #tempfile = self.datafolder + "/" + topic.replace("/", "-") + ".csv"
 csv_path = os.path.splitext(args.bagfile)[0] + '/' + args.eventtopic + '-events.csv'
+hdf5_out = os.path.splitext(args.bagfile)[0] + '.hdf5'
 
 #TODO: Migrate completely to either bagpy or rosbag later
 if not os.path.isfile(csv_path):
@@ -62,7 +61,7 @@ else:
     input_bag = rosbag.Bag(args.bagfile, "r")
 
 
-with h5py.File(args.out,"w") as outfile:
+with h5py.File(hdf5_out,"w") as outfile:
     event_stamps_file = open(os.path.splitext(args.bagfile)[0]+'/event_stamps.txt', 'a')
     all_events = pd.read_csv(csv_path)['events']
     print('Converted .bag to .csv.')

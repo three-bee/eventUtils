@@ -2,11 +2,12 @@
 Extracts image_raw data from a bag file (containing event data).
 Run with Python 2 as imgmsg_to_cv2 function does not work with Python 3.
 
+Extracted image files can be later utilized by flow2hdf5.py.
+
 Bahri Batuhan Bilecen, 2021 August
 """
 
 import os
-import sys
 import argparse
 import rosbag
 from sensor_msgs.msg import Image
@@ -24,7 +25,10 @@ bridge = CvBridge()
 total_images = input_bag.get_message_count(topic_filters=('/' + args.eventtopic + '/image_raw'))
 
 save_path = os.path.splitext(args.bagfile)[0] + '/frames'
-os.makedirs(save_path)
+try:
+    os.makedirs(save_path)
+except OSError:
+    pass
 
 count = 0
 for topic, msg, t in input_bag.read_messages(topics=[('/' + args.eventtopic + '/image_raw')]):
