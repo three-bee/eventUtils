@@ -44,7 +44,7 @@ args = parser.parse_args()
 #TODO: Automatize eventtopic argument
 #tempfile = self.datafolder + "/" + topic.replace("/", "-") + ".csv"
 csv_path = os.path.splitext(args.bagfile)[0] + '/' + args.eventtopic + '-events.csv'
-hdf5_out = os.path.splitext(args.bagfile)[0] + '.hdf5'
+hdf5_out = os.path.splitext(args.bagfile)[0] + '_data.hdf5'
 
 #TODO: Migrate completely to either bagpy or rosbag later
 if not os.path.isfile(csv_path):
