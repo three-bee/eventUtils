@@ -91,9 +91,8 @@ with h5py.File(hdf5_out,"w") as outfile:
             event_splitted = event.split('\n')
 
             #x and y
-            #Note: changed x&y order
-            hdf_events[event_count,1] = int(''.join(i for i in event_splitted[0] if i.isnumeric()))
-            hdf_events[event_count,0] = int(''.join(i for i in event_splitted[1] if i.isnumeric()))
+            hdf_events[event_count,0] = int(''.join(i for i in event_splitted[0] if i.isnumeric()))
+            hdf_events[event_count,1] = int(''.join(i for i in event_splitted[1] if i.isnumeric()))
             
             #t: secs, nsecs
             secs = int(''.join(i for i in event_splitted[3] if i.isnumeric()))
