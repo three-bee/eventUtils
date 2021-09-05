@@ -13,7 +13,8 @@ args = parser.parse_args()
 
 def batch_reduce_rate(images_path, rate):
     images_list = sorted(next(os.walk(images_path))[2])
-    dst = images_path + 'lowrate'
+    dst = images_path[0:-9] + 'lowrate'
+
     try:
         os.makedirs(dst)
     except OSError:
@@ -27,7 +28,9 @@ def batch_reduce_rate(images_path, rate):
             break
         command = 'cp ' + src + ' ' + dst
         os.popen(command)
-    return print('Done downsampling.')
+    
+    print('Done downsampling: ' + dst)
+    return dst+'/'
     
 def batch_crop_1to1(images_path):
     images_list = sorted(next(os.walk(images_path))[2])
@@ -45,7 +48,9 @@ def batch_crop_1to1(images_path):
         offset = int((x-crop_size)/2) if x>crop_size else int((y-crop_size)/2)
         cv_img = cv2.imread(src)[:, offset : -offset]
         cv2.imwrite(dst + '/cropped%03d.png'%idx, cv_img)
-    return print('Done cropping.')
+    
+    print('Done cropping: ' + dst)
+    return dst+'/'
 
 def batch_resize(images_path,ratio):
     images_list = sorted(next(os.walk(images_path))[2])
@@ -63,18 +68,21 @@ def batch_resize(images_path,ratio):
         (r_x,r_y) = (int(x/ratio),int(y/ratio))
         resized = cv2.resize(cv_img, (r_x,r_y))
         cv2.imwrite(dst + '/resized%03d.png'%idx, resized)
-    return print('Done resizing.')
+    
+    print('Done resizing: ' + dst)
+    return dst+'/'
 
 def main():
-    lowratepath = args.highratepath + 'lowrate/'
+    #TODO: bad practice for indexing, fix other solution
+    lowratepath = args.highratepath[:-9] + 'lowrate/'
 
     batch_reduce_rate(args.highratepath, args.rate)
 
-    batch_resize(args.highratepath, args.resizeratio)
-    batch_resize(lowratepath, args.resizeratio)
+    resized_highrate_path = batch_resize(args.highratepath, args.resizeratio)
+    resized_lowrate_path = batch_resize(lowratepath, args.resizeratio)
 
-    batch_crop_1to1(args.highratepath)
-    batch_crop_1to1(lowratepath)
+    batch_crop_1to1(resized_highrate_path)
+    batch_crop_1to1(resized_lowrate_path)
 
 if __name__=='__main__':
     main()
