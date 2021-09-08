@@ -7,7 +7,7 @@ both taken from the same video sequence, but with different sampling rates.
 Each adjacent high framerate image pair must have a ground-truth optical flow .flo file.
 Using the match as an index for image_stamps.txt file, corresponding flow files are first resized, then written to a .hdf5 file.
 
-If images had to be cropped in 1:1 ratio from the middle, then flow files can be cropped accordingly as well with --cropped flag.
+If images had to be cropped in 1:1 ratio from the middle, then flow files can be cropped accordingly as well with --crop flag.
 
 Output of this script acts as a ground-truth optical flow counterpart to outputs of bag2hdf5 & img2hdf5.
 
