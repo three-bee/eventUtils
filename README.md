@@ -10,5 +10,4 @@ Event-based vision utility scripts.
     * Generating events in .rosbag format via [ESIM](https://github.com/uzh-rpg/rpg_esim) using processed high framerate images & flows 
     * Converting .rosbag dataset into .hdf5
     * Split encoding of data in hdf5 file (part of [Spike-FlowNet](https://github.com/chan8972/Spike-FlowNet))
-
-* Must run roscore in another terminal beforehand for auto.bash.
+        * Before running auto.bash, roscore should be run beforehand, and paths should be changed accordingly.
