@@ -6,14 +6,15 @@ import argparse
 import cv2
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--highratepath', type=str, help='Path of high framerate images')
+parser.add_argument('--imgpath', type=str, help='Path of high framerate images')
+parser.add_argument('--flowpath', type=str, help='Path of flo files of highrate images')
 parser.add_argument('--rate', type=int, help='Rate of downsampling')
 parser.add_argument('--resizeratio', type=float, help='Resize ratio. w & h -> w/ratio & h/ratio')
 args = parser.parse_args()
 
 def batch_reduce_rate(images_path, rate):
     images_list = sorted(next(os.walk(images_path))[2])
-    dst = images_path[0:-9] + 'lowrate'
+    dst = images_path[0:-1] + '_lowrate'
 
     try:
         os.makedirs(dst)
@@ -74,11 +75,12 @@ def batch_resize(images_path,ratio):
 
 def main():
     #TODO: bad practice for indexing, fix other solution
-    lowratepath = args.highratepath[:-9] + 'lowrate/'
+    lowratepath = args.imgpath[:-1] + '_lowrate/'
 
-    batch_reduce_rate(args.highratepath, args.rate)
+    batch_reduce_rate(args.imgpath, args.rate)
+    batch_reduce_rate(args.flowpath, args.rate)
 
-    resized_highrate_path = batch_resize(args.highratepath, args.resizeratio)
+    resized_highrate_path = batch_resize(args.imgpath, args.resizeratio)
     resized_lowrate_path = batch_resize(lowratepath, args.resizeratio)
 
     batch_crop_1to1(resized_highrate_path)

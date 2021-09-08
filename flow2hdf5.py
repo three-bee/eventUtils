@@ -26,7 +26,7 @@ parser.add_argument('--hdf5path', type=str, help='Path of the output of img2hdf5
 parser.add_argument('--gtflowpath', type=str, help='Path of ground truth .flo files')
 parser.add_argument('--lowratepath', type=str, help='Path of image files extracted from hdf5 or rosbag file')
 parser.add_argument('--highratepath', type=str, help='Path of high framerate image files')
-parser.add_argument('--cropped', type=bool, default=False, help='True if flow files in gtflowpath need to be cropped in 1:1 (from center).')
+parser.add_argument('--crop', type=bool, default=False, help='True if flow files in gtflowpath need to be cropped in 1:1 (from center).')
 args = parser.parse_args()
 
 highrate_path_list = sorted(next(os.walk(args.highratepath))[2]) #Does not include subfolders. All items in the directory must be images.
@@ -52,7 +52,7 @@ bar_flow =  Bar('Writing flow files...', max=total_lowrate-1)
 
 with h5py.File(gt_file,"w") as outfile, open(image_stamps_path,'r') as image_stamps:    
     group_left = outfile.create_group("davis").create_group("left")
-    if args.cropped:
+    if args.crop:
         hdf_flow_dist = group_left.create_dataset("flow_dist", (total_lowrate-1,2,crop_size,crop_size), dtype='f8') 
     else:
         hdf_flow_dist = group_left.create_dataset("flow_dist", (total_lowrate-1,2,y,x), dtype='f8')
@@ -65,7 +65,7 @@ with h5py.File(gt_file,"w") as outfile, open(image_stamps_path,'r') as image_sta
         f_y,f_x,_ = flow.shape
         ratio = int(f_y/crop_size) if y<=x else int(f_x/crop_size)
         
-        if args.cropped:
+        if args.crop:
             #First resize
             (x,y) = (int(f_x/ratio), int(f_y/ratio))
             u = cv2.resize(flow[...,0],(x,y))
