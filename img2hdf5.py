@@ -37,7 +37,6 @@ with h5py.File(args.hdf5path,"r+") as outfile:
 
     for image in image_path_list:
         grayscale = cv2.imread(args.imagepath + image, 0)
-        #TODO: Check visually if transpose is OK
         hdf_image_raw[image_count] = grayscale
         bar_image_raw.next()
         image_count += 1
