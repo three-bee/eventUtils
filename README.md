@@ -8,6 +8,6 @@ Event-based vision utility scripts.
 * **auto.bash:** Runs all necessary scripts for:
     * Pre-processing (resizing, downsampling etc.) high framerate images and their flow files
     * Generating events in .rosbag format via [ESIM](https://github.com/uzh-rpg/rpg_esim) using processed high framerate images & flows 
-    * Converting .rosbag dataset into .hdf5
+    * Converting .rosbag dataset into .hdf5, taking [MVSEC dataset](https://daniilidis-group.github.io/mvsec/) as a guideline
     * Split encoding of data in hdf5 file (part of [Spike-FlowNet](https://github.com/chan8972/Spike-FlowNet))
         * Before running auto.bash, roscore should be run beforehand, and paths should be changed accordingly.
