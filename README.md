@@ -5,6 +5,7 @@ Event-based vision utility scripts.
 * **bag2img.py:** Extracts image_raw data from a rosbag file.
 * **img2hdf5.py:** Writes grayscale image data read from a directory into an existing hdf5 file.
 * **flow2hdf5.py:** Writes .flo files read from a directory into a new hdf5 file, with their corresponding timestamps to the output of bag2hdf5.py.
+* **metrics.py** Includes some optical flow evaluation metrics.
 * **auto.bash:** Runs all necessary scripts for:
     * Pre-processing (resizing, downsampling etc.) high framerate images and their flow files
     * Generating events in .rosbag format via [ESIM](https://github.com/uzh-rpg/rpg_esim) using processed high framerate images & flows 
