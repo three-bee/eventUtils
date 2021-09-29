@@ -16,7 +16,7 @@ from cv_bridge import CvBridge
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bagfile', type=str, help='.bag file')
-parser.add_argument('--eventtopic', type=str, default='dvs', help='Topic name in which the event data are stored. Mostly it is dvs(ETH Zurich Event Dataset), davis(MVSEC), or cam0 (ESIM output)')
+parser.add_argument('--eventtopic', type=str, default='dvs', help='Topic name in which the event data are stored. Mostly it is dvs(http://rpg.ifi.uzh.ch/davis_data.html), davis(MVSEC), or cam0 (ESIM output)')
 args = parser.parse_args()
 
 input_bag = rosbag.Bag(args.bagfile, "r")
