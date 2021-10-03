@@ -12,6 +12,7 @@ parser.add_argument('--countdatapath', type=str, help='Path of count_data folder
 args = parser.parse_args()
 
 countdata_path_list = sorted(next(os.walk(args.countdatapath))[2]) #Does not include subfolders. All items in the directory must be npy files.
+#Keep in mind that countdata_path_list is NOT in order, even after the sorting function.
 
 dst = args.countdatapath + '/spikeimages'
 try:
@@ -28,4 +29,6 @@ for data in countdata_path_list:
         spike_img += count_data[1,:,:,i]
 
     ret, spike_img = cv2.threshold(spike_img, 0, 255, cv2.THRESH_BINARY)
-    cv2.imwrite(dst + '/' + data[:-4] + '.png', spike_img)
+    
+    filename = '%05d.png'%int(data[:-4]) #For sorting purposes
+    cv2.imwrite(dst + '/' + filename, spike_img)
