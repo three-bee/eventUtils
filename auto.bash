@@ -1,6 +1,6 @@
 #!/bin/sh
 #Paths
-outfolder=/home/bbatu/SINTELOUT
+outfolder=/home/bbatu/SINTELOUT_256_5
 imgfolder=/home/bbatu/SINTEL/sintel_data_1008fps/clean_1008fps
 flowfolder=/home/bbatu/SINTEL/flow_1008fps
 spikeflownetpath=/home/bbatu/Spike-FlowNet
@@ -8,13 +8,14 @@ utilspath=/home/bbatu/eventUtils
 
 #Preprocessing params
 crop=True
+highframerate=200
 rate=4
-resizeratio=4
+resizeratio=3.40625
 
 #ESIM Params
 eventtopic=cam0
-c_pos=0.15
-c_neg=0.15
+c_pos=0.05
+c_neg=0.05
 exposure_time_ms=10.0
 
 cd "$imgfolder"
@@ -22,13 +23,13 @@ for folder in */; do
     data=${folder%/}
     printf "############## 1. Preprocessing images: (%s)\n" "$data"
     python "$utilspath"/preprocess.py --imgpath="$imgfolder"/"$data"/ --flowpath="$flowfolder"/"$data"/ --rate="$rate" --resizeratio="$resizeratio"
-    ffmpeg -r 200 -i "$imgfolder"/"$data"/resized/cropped/cropped%3d.png -vb 50M "$outfolder"/"$data".mpg
+    ffmpeg -r "$highframerate" -i "$imgfolder"/"$data"/resized/cropped/cropped%3d.png -vb 50M "$outfolder"/"$data".mpg
 
     #ssim alias
     printf "############## 2. Creating events from images: (%s)\n" "$data"
     source ~/setupeventsim.sh
     roscd esim_ros 
-    python scripts/generate_stamps_file.py -i "$imgfolder"/"$data"/resized/cropped/ -r 200.0
+    python scripts/generate_stamps_file.py -i "$imgfolder"/"$data"/resized/cropped/ -r "$highframerate"
     rosrun esim_ros esim_node \
     --data_source=2 \
     --path_to_output_bag="$outfolder"/"$data".bag \
@@ -51,8 +52,9 @@ for folder in */; do
     --highratepath="$imgfolder"/"$data"/resized/cropped/ \
     --crop="$crop"
 
-    printf "############## 4. Split encoding: (%s)\n" "$data"
+    printf "############## 4. Split encoding and event spike representation generation: (%s)\n" "$data"
     python "$spikeflownetpath"/encoding/split_coding.py --save-dir="$outfolder"/ --save-env="$outfolder"/"$data"/ --data-path="$outfolder"/"$data".hdf5
+    python "$utilspath"/bin_events.py --countdatapath="$outfolder"/"$data"/count_data
 
     printf "############## 5. Cleanup and renaming: (%s)\n" "$data"
     mv "$outfolder"/"$data".bag "$outfolder"/"$data"/

@@ -63,7 +63,7 @@ with h5py.File(gt_file,"w") as outfile, open(image_stamps_path,'r') as image_sta
     for i in range(0,total_lowrate-1):
         flow = flowpy.flow_read(args.gtflowpath + gtflow_path_list[rate*i]) #0 rate rate*2 ...
         f_y,f_x,_ = flow.shape
-        ratio = int(f_y/crop_size) if y<=x else int(f_x/crop_size)
+        ratio = float(f_y/crop_size) if y<=x else float(f_x/crop_size)
         
         if args.crop:
             #First resize
@@ -72,8 +72,13 @@ with h5py.File(gt_file,"w") as outfile, open(image_stamps_path,'r') as image_sta
             v = cv2.resize(flow[...,1],(x,y))
             #Then crop 1:1 image flow from the middle
             offset = int((x-crop_size)/2) if x>crop_size else int((y-crop_size)/2)
+            
             u = u[..., offset : -offset]
             v = v[..., offset : -offset]
+
+            #Just in case there is still few pixels of size mismatch, resize
+            u = cv2.resize(flow[...,0],(crop_size,crop_size))
+            v = cv2.resize(flow[...,1],(crop_size,crop_size))
         else:
             u = cv2.resize(flow[...,0],(x,y))
             v = cv2.resize(flow[...,1],(x,y))
