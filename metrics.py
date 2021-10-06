@@ -15,7 +15,7 @@ parser.add_argument('--gtflowpath', type=str, help='Path of gt flow')
 parser.add_argument('--predflowpath', type=str, help='Path of pred flow')
 parser.add_argument('--ratio', type=int, help='Resize ratio for ground truth flow.')
 parser.add_argument('--crop', type=bool, default=True, help='True if flow files in gtflowpath need to be cropped in 1:1 (from center).')
-parser.add_argument('--maskenabled', type=bool, default=False, help='Mask enable flag.')
+parser.add_argument('--maskenabled', type=str, default='True', help='Mask enable flag.')
 parser.add_argument('--maskpath', type=str, default='not a meaningful path', help='Path of event masks.')
 args = parser.parse_args()
 
@@ -58,6 +58,10 @@ for i in range(0,total_number_flow-1):
         u = u[..., offset : -offset]
         v = v[..., offset : -offset]
 
+        #Just in case there is still few pixels of size mismatch, resize
+        u = cv2.resize(u, (crop_size,crop_size))
+        v = cv2.resize(v, (crop_size,crop_size))
+
         gt_flow_resized = np.zeros((u.shape[0],u.shape[1],2))
         gt_flow_resized[...,0] = u
         gt_flow_resized[...,1] = v
@@ -80,7 +84,7 @@ for i in range(0,total_number_flow-1):
         pred_flow_resized = pred_flow
 
     #If an event mask path is given, mask endpoint error inputs
-    if args.maskenabled==False:
+    if args.maskenabled!='True':
         AEE_sum += avg_endpoint_error(gt_flow_resized, pred_flow_resized)
     else:
         mask = cv2.imread(args.maskpath + mask_path_list[i], cv2.IMREAD_GRAYSCALE)
@@ -89,6 +93,6 @@ for i in range(0,total_number_flow-1):
             mask = cv2.resize(mask, pred_flow_resized[...,0].shape)
         AEE_sum += avg_endpoint_error_masked(gt_flow_resized, pred_flow_resized, mask)
     
-if args.maskenabled==False: print('AEE is NOT masked.')
+if args.maskenabled!='True': print('AEE is NOT masked.')
 else: print('AEE is masked.') 
 print('AEE: %f' %(AEE_sum/total_number_flow))
