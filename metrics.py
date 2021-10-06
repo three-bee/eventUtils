@@ -13,7 +13,7 @@ import cv2
 parser = argparse.ArgumentParser()
 parser.add_argument('--gtflowpath', type=str, help='Path of gt flow')
 parser.add_argument('--predflowpath', type=str, help='Path of pred flow')
-parser.add_argument('--ratio', type=int, help='Resize ratio for ground truth flow.')
+parser.add_argument('--ratio', type=float, help='Resize ratio for ground truth flow.')
 parser.add_argument('--crop', type=bool, default=True, help='True if flow files in gtflowpath need to be cropped in 1:1 (from center).')
 parser.add_argument('--maskenabled', type=str, default='True', help='Mask enable flag.')
 parser.add_argument('--maskpath', type=str, default='not a meaningful path', help='Path of event masks.')
