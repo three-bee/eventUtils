@@ -48,9 +48,11 @@ def batch_crop_1to1(images_path):
         src = images_path + image
         offset = int((x-crop_size)/2) if x>crop_size else int((y-crop_size)/2)
         cv_img = cv2.imread(src)[:, offset : -offset]
+        cv_img = cv2.resize(cv_img, (crop_size, crop_size))
         cv2.imwrite(dst + '/cropped%03d.png'%idx, cv_img)
     
     print('Done cropping: ' + dst)
+    print(cv_img.shape)
     return dst+'/'
 
 def batch_resize(images_path,ratio):

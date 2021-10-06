@@ -1,6 +1,6 @@
 #!/bin/sh
 #Paths
-outfolder=/home/bbatu/SINTELOUT_256_5
+outfolder=/home/bbatu/SINTELOUT_258_5
 imgfolder=/home/bbatu/SINTEL/sintel_data_1008fps/clean_1008fps
 flowfolder=/home/bbatu/SINTEL/flow_1008fps
 spikeflownetpath=/home/bbatu/Spike-FlowNet
@@ -10,7 +10,7 @@ utilspath=/home/bbatu/eventUtils
 crop=True
 highframerate=200
 rate=4
-resizeratio=3.40625
+resizeratio=3.379844
 
 #ESIM Params
 eventtopic=cam0
