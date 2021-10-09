@@ -1,6 +1,6 @@
 #!/bin/sh
 #Paths
-outfolder=/home/bbatu/SINTELOUT_258_5
+outfolder=/home/bbatu/SINTELOUT_258_25
 imgfolder=/home/bbatu/SINTEL/sintel_data_1008fps/clean_1008fps
 flowfolder=/home/bbatu/SINTEL/flow_1008fps
 spikeflownetpath=/home/bbatu/Spike-FlowNet
@@ -14,8 +14,8 @@ resizeratio=3.379844
 
 #ESIM Params
 eventtopic=cam0
-c_pos=0.05
-c_neg=0.05
+c_pos=0.25
+c_neg=0.25
 exposure_time_ms=10.0
 
 cd "$imgfolder"

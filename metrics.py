@@ -30,6 +30,33 @@ def avg_endpoint_error_masked(gt_flow, pred_flow, mask):
     AEE = np.mean(EE)
     return AEE
 
+#Taken from Spike-FlowNet: https://github.com/chan8972/Spike-FlowNet
+def flow_viz_np(flow_x, flow_y):
+    flows = np.stack((flow_x, flow_y), axis=2)
+    mag = np.linalg.norm(flows, axis=2)
+
+    ang = np.arctan2(flow_y, flow_x)
+    ang += np.pi #rad
+    ang *= 180. / np.pi / 2. #deg
+
+    ang = ang.astype(np.uint8)
+    hsv = np.zeros([flow_x.shape[0], flow_x.shape[1], 3], dtype=np.uint8)
+    hsv[:, :, 0] = ang
+    hsv[:, :, 1] = 255
+    hsv[:, :, 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+
+    flow_rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+    flow_rgb = cv2.bitwise_not(flow_rgb)
+    return flow_rgb
+
+#Taken from Spike-FlowNet: https://github.com/chan8972/Spike-FlowNet
+def draw_color_wheel_np(width, height):
+    color_wheel_x = np.linspace(-width / 2.,width / 2.,width)
+    color_wheel_y = np.linspace(-height / 2.,height / 2.,height)
+    color_wheel_X, color_wheel_Y = np.meshgrid(color_wheel_x, color_wheel_y)
+    color_wheel_rgb = flow_viz_np(color_wheel_X, color_wheel_Y)
+    return color_wheel_rgb
+
 gtflow_path_list = sorted(next(os.walk(args.gtflowpath))[2]) #Does not include subfolders. All items in the directory must be flo files.
 predflow_path_list = sorted(next(os.walk(args.predflowpath))[2])
 mask_path_list = sorted(next(os.walk(args.maskpath))[2])
@@ -39,6 +66,13 @@ y = flowpy.flow_read(args.gtflowpath + gtflow_path_list[0]).shape[0]
 x = flowpy.flow_read(args.gtflowpath + gtflow_path_list[0]).shape[1]
 
 AEE_sum = 0
+
+try:
+    os.makedirs(args.predflowpath + 'notmasked')
+    os.makedirs(args.predflowpath + 'masked')
+    os.makedirs(args.predflowpath + 'gt')
+except OSError:
+    pass
 
 for i in range(0,total_number_flow-1):
     #Process ground truth flow (resize, cut from center)
@@ -93,6 +127,14 @@ for i in range(0,total_number_flow-1):
             mask = cv2.resize(mask, pred_flow_resized[...,0].shape)
         AEE_sum += avg_endpoint_error_masked(gt_flow_resized, pred_flow_resized, mask)
     
-if args.maskenabled!='True': print('AEE is NOT masked.')
-else: print('AEE is masked.') 
+    #Writing images of flows
+    cv2.imwrite(args.predflowpath + 'notmasked/' + 'densepredflow%03d.png'%i, flow_viz_np(pred_flow_resized[...,0],pred_flow_resized[...,1]))
+    
+    mask3dim = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+    cv2.imwrite(args.predflowpath + 'masked/' + 'predflow%03d.png'%i, cv2.bitwise_and(flow_viz_np(pred_flow_resized[...,0],pred_flow_resized[...,1]), mask3dim))
+    
+    cv2.imwrite(args.predflowpath + 'gt/' + 'gt%03d.png'%i, flow_viz_np(gt_flow_resized[...,0],gt_flow_resized[...,1]))
+
+if args.maskenabled != 'True':  print('AEE is NOT masked.')
+else:   print('AEE is masked.') 
 print('AEE: %f' %(AEE_sum/total_number_flow))
