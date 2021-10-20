@@ -46,7 +46,7 @@ def flow_viz_np(flow_x, flow_y):
     hsv[:, :, 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
 
     flow_rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
-    flow_rgb = cv2.bitwise_not(flow_rgb)
+    #flow_rgb = cv2.bitwise_not(flow_rgb)
     return flow_rgb
 
 #Taken from Spike-FlowNet: https://github.com/chan8972/Spike-FlowNet
@@ -130,8 +130,9 @@ for i in range(0,total_number_flow-1):
     #Writing images of flows
     cv2.imwrite(args.predflowpath + 'notmasked/' + 'densepredflow%03d.png'%i, flow_viz_np(pred_flow_resized[...,0],pred_flow_resized[...,1]))
     
-    mask3dim = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-    cv2.imwrite(args.predflowpath + 'masked/' + 'predflow%03d.png'%i, cv2.bitwise_and(flow_viz_np(pred_flow_resized[...,0],pred_flow_resized[...,1]), mask3dim))
+    if args.maskenabled=='True':
+        mask3dim = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+        cv2.imwrite(args.predflowpath + 'masked/' + 'predflow%03d.png'%i, cv2.bitwise_and(flow_viz_np(pred_flow_resized[...,0],pred_flow_resized[...,1]), mask3dim))
     
     cv2.imwrite(args.predflowpath + 'gt/' + 'gt%03d.png'%i, flow_viz_np(gt_flow_resized[...,0],gt_flow_resized[...,1]))
 

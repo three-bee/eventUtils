@@ -1,5 +1,5 @@
 #!/bin/sh
-ctresh=25
+ctresh=15
 resolution=258
 crop=True
 resizeratio=3.379844
@@ -19,5 +19,5 @@ for folder in */; do
     --ratio="$resizeratio" \
     --crop="$crop" \
     --maskpath="$event_dataset"/"$data"/count_data/spikeimages/ \
-    --maskenabled=True
+    --maskenabled=False
 done
